@@ -30,6 +30,9 @@ class Compte implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
+    #[ORM\OneToOne(mappedBy: 'lier', cascade: ['persist', 'remove'])]
+    private ?Eleve $eleve = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -104,5 +107,22 @@ class Compte implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getEleve(): ?Eleve
+    {
+        return $this->eleve;
+    }
+
+    public function setEleve(Eleve $eleve): static
+    {
+        // set the owning side of the relation if necessary
+        if ($eleve->getLier() !== $this) {
+            $eleve->setLier($this);
+        }
+
+        $this->eleve = $eleve;
+
+        return $this;
     }
 }

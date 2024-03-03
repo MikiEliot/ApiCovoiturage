@@ -20,7 +20,7 @@ class CompteController extends AbstractController
     {
         $this->passwordHasher = $passwordHasher;
     }
-    #[Route('/login/{login},{password}', name: 'app_login', methods: ['POST'])]
+    #[Route('/api/login/{login},{password}', name: 'app_login', methods: ['POST'])]
     public function login(string $login, string $password, EntityManagerInterface $entityManager, Token $token) : JsonResponse
     {
         try{
@@ -30,21 +30,21 @@ class CompteController extends AbstractController
             if (!$compte) {
                 return $this->json([
                     'error' => 'Aucun compte avec ce login',
-                ], Response::HTTP_NOT_FOUND);
+                ]);
             }
 
             // Check if the provided password is valid
             if (!$this->passwordHasher->isPasswordValid($compte, $password)) {
                 return $this->json([
                     'error' => 'Mot de passe incorrect',
-                ], Response::HTTP_UNAUTHORIZED);
+                ]);
             }
 
             $token = $token->generateToken($compte);
             $expirationTime = (new \DateTime())->add(new \DateInterval('PT' . $this->getParameter('lexik_jwt_authentication.token_ttl') . 'S'));
 
             $resultat = [
-                'message' => 'Connexion réussie',
+                'message' => 'Connexion reussie',
                 'token' => $token,
                 'expiration' => $expirationTime->format('Y-m-d H:i:s')
             ];
@@ -56,7 +56,7 @@ class CompteController extends AbstractController
     }
 
 
-    #[Route('/register/{login},{password}', name: 'app_register', methods: ['POST'])]
+    #[Route('/api/register/{login},{password}', name: 'app_register', methods: ['POST'])]
     public function register(string $login, string $password, EntityManagerInterface $entityManager): JsonResponse
     {
         try{
@@ -64,8 +64,7 @@ class CompteController extends AbstractController
             // verifier si le compte existe deja, si oui on retourne une erreur
             if ($utilisateurExistant) {
                 return $this->json([
-                    'error' => 'Un compte avec ce login existe déjà',
-                ], 400);
+                    'error' => 'Un compte avec ce login existe deja',]);
             }
             // si le compte n'existe pas, on le crée
             $compte = new Compte();
@@ -78,10 +77,10 @@ class CompteController extends AbstractController
             $entityManager->flush();
 
             $resultat = [
-                'message' => 'Compte créé avec succès',
+                'message' => 'Compte cree avec succes',
             ];
         } catch (Exception $e) {
-            return new JsonResponse(['error' => 'Erreur lors de la création du compte', 'exception' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(['error' => 'Erreur lors de la creation du compte', 'exception' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
         return new JsonResponse($resultat, Response::HTTP_CREATED);
     }
