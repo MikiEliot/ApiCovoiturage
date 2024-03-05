@@ -15,6 +15,43 @@ use Symfony\Component\HttpFoundation\Response;
 
 class VilleController extends AbstractController
 {
+
+    /**
+     * @OA\Post(
+     *     path="/api/insertVille/{nom},{cp}",
+     *     summary="Insérer une ville",
+     *     @OA\Parameter(
+     *         name="nom",
+     *         in="path",
+     *         description="Le nom de la ville",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="cp",
+     *         in="path",
+     *         description="Le code postal de la ville",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Retourne un message de succès lors de la création réussie",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Retourne une erreur si une exception est levée lors de la création de la ville",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     )
+     * )
+     */
     #[Route('/insertVille/{nom},{cp}', name: 'app_insert_ville', methods: ['POST'])]
     public function insertVille(string $nom, string $cp, EntityManagerInterface $entityManager): JsonResponse
     {
@@ -31,6 +68,44 @@ class VilleController extends AbstractController
             return new JsonResponse(['error' => 'Erreur lors de la création de la ville: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    /**
+     * @OA\Delete(
+     *     path="/api/deleteVille/{id}",
+     *     summary="Supprimer une ville",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="L'identifiant de la ville",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Retourne un message de succès lors de la suppression réussie",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Retourne une erreur si la ville n'est pas trouvée",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Retourne une erreur si une exception est levée lors de la suppression de la ville",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     )
+     * )
+     */
     #[Route('/deleteVille/{id}', name: 'app_delete_ville', methods: ['DELETE'])]
     public function deleteVille(int $id, EntityManagerInterface $entityManager): JsonResponse
     {
@@ -49,6 +124,37 @@ class VilleController extends AbstractController
             return new JsonResponse(['error' => 'Erreur lors de la suppression de la ville: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/listeVille",
+     *     summary="Lister les villes",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Retourne une liste de villes",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref=@Model(type=Ville::class))
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Retourne une erreur si aucune ville n'est trouvée",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Retourne une erreur si une exception est levée lors de la récupération des villes",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     )
+     * )
+     */
     #[Route('/listeVille', name: 'app_liste_ville', methods: ['GET'])]
     public function listeVille(EntityManagerInterface $entityManager): JsonResponse
     {

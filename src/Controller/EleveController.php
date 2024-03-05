@@ -18,7 +18,40 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api')]
 class EleveController extends AbstractController
 {
-
+    /**
+     * @OA\Get(
+     *     path="/api/selectPersonne/{id}",
+     *     summary="Sélectionner une personne",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="L'identifiant de l'élève",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Retourne les détails de l'élève lors de la sélection réussie",
+     *         @OA\JsonContent(ref=@Model(type=Eleve::class))
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Retourne une erreur si l'élève n'est pas trouvé",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Retourne une erreur si une exception est levée lors de la récupération des détails de l'élève",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     )
+     * )
+     */
     #[Route('/selectPersonne/{id}', name: 'app_select_personne', methods: ['GET'])]
     public function selectPersonne(int $id, EleveRepository $eleves): JsonResponse
     {
@@ -46,6 +79,38 @@ class EleveController extends AbstractController
             return new JsonResponse(['error' => "eleve non trouve"], Response::HTTP_BAD_REQUEST);
         }
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/listPersonne",
+     *     summary="Lister les personnes",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Retourne une liste de personnes",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref=@Model(type=Eleve::class))
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Retourne une erreur si aucune personne n'est trouvée",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Retourne une erreur si une exception est levée lors de la récupération des personnes",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     )
+     * )
+     */
+
     #[Route('/listPersonne', name: 'app_eleve_liste', methods: ['GET'])]
     public function listPersonne(EleveRepository $eleveRepository): JsonResponse
     {
@@ -75,6 +140,76 @@ class EleveController extends AbstractController
         }
 
     }
+
+
+    /**
+     * @OA\Post(
+     *     path="/api/insertPersonne/{lierId},{prenom},{nom},{tel},{email},{ville},{voiture}",
+     *     summary="Inscrire une personne",
+     *     @OA\Parameter(
+     *         name="lierId",
+     *         in="path",
+     *         description="L'identifiant du compte lié",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="prenom",
+     *         in="path",
+     *         description="Le prénom de l'élève",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="nom",
+     *         in="path",
+     *         description="Le nom de l'élève",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="tel",
+     *         in="path",
+     *         description="Le téléphone de l'élève",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="email",
+     *         in="path",
+     *         description="L'email de l'élève",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="ville",
+     *         in="path",
+     *         description="L'identifiant de la ville de l'élève",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="voiture",
+     *         in="path",
+     *         description="L'identifiant de la voiture de l'élève",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Retourne un message de succès lors de l'inscription réussie",
+     *         @OA\JsonContent(ref=@Model(type=Eleve::class))
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Retourne une erreur si une exception est levée lors de l'inscription",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     )
+     * )
+     */
     #[Route('/insertPersonne/{lierId},{prenom},{nom},{tel},{email},{ville},{voiture}', name: 'app_eleve_insert', methods: ['POST'])]
     public function insertPersonne(int $lierId,string $prenom, string $nom, string $tel, string $email, int $ville, int $voiture, EntityManagerInterface $entityManager): JsonResponse
     {
@@ -112,9 +247,47 @@ class EleveController extends AbstractController
 
         return new JsonResponse($data, Response::HTTP_OK);
     }
+
+    /**
+     * @OA\Delete(
+     *     path="/api/deletePersonne/{id}",
+     *     summary="Supprimer une personne",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="L'identifiant de l'élève",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Retourne un message de succès lors de la suppression réussie",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Retourne une erreur si l'élève n'est pas trouvé",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Retourne une erreur si une exception est levée lors de la suppression de l'élève",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     )
+     * )
+     */
     #[Route('/deletePersonne/{id}', name: 'app_eleve_delete', methods: ['DELETE'])]
     public function deletePersonne(EntityManagerInterface $entityManager, int $id): JsonResponse
-{
+    {
     $eleve = $entityManager->getRepository(Eleve::class)->find($id);
     try {
         if (!$eleve) {

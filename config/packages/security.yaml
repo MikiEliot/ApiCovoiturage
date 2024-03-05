@@ -21,6 +21,8 @@ security:
                 check_path: /api/login_check
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
+                username_path: login
+                password_path: password
             jwt: ~
 
 
@@ -39,8 +41,8 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
          - { path: ^/api/login, roles: PUBLIC_ACCESS }
+         - { path: ^/api/doc, roles: PUBLIC_ACCESS }
          - { path: ^/api/register, roles: PUBLIC_ACCESS }
-         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
          - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
          # { path: ^/api/listeMarque, roles: ROLE_ADMIN }
          # { path: ^/api/deleteMarque, roles: ROLE_ADMIN }

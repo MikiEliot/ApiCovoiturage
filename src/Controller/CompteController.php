@@ -20,10 +20,39 @@ class CompteController extends AbstractController
     {
         $this->passwordHasher = $passwordHasher;
     }
-    #[Route('/api/login/{login},{password}', name: 'app_login', methods: ['POST'])]
-    public function login(string $login, string $password, EntityManagerInterface $entityManager, Token $token) : JsonResponse
+    /**
+     * @OA\Post(
+     *     path="/api/login/{login},{password}",
+     *     summary="Connecter un utilisateur",
+     *     @OA\Parameter(
+     *         name="login",
+     *         in="path",
+     *         description="Le login de l'utilisateur",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="password",
+     *         in="path",
+     *         description="Le mot de passe de l'utilisateur",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Retourne un token lors de la connexion réussie",
+     *         @OA\JsonContent(ref=@Model(type=Compte::class))
+     *     )
+     * )
+     */
+    #[Route('/api/login', name: 'app_login', methods: ['POST'])]
+    public function login(Request $request, EntityManagerInterface $entityManager, Token $token) : JsonResponse
     {
         try{
+            $data = json_decode($request->getContent(), true);
+            $login = $data['login'];
+            $password = $data['password'];
+
             // on recupere le compte correspondant au login
             $compte = $entityManager->getRepository(Compte::class)->findOneBy(['login' => $login]);
             // si le compte n'existe pas, on retourne une erreur
@@ -55,11 +84,39 @@ class CompteController extends AbstractController
         return new JsonResponse($resultat, Response::HTTP_OK);
     }
 
-
-    #[Route('/api/register/{login},{password}', name: 'app_register', methods: ['POST'])]
-    public function register(string $login, string $password, EntityManagerInterface $entityManager): JsonResponse
+    /**
+     * @OA\Post(
+     *     path="/api/register/{login},{password}",
+     *     summary="Enregistrer un nouvel utilisateur",
+     *     @OA\Parameter(
+     *         name="login",
+     *         in="path",
+     *         description="Le login du nouvel utilisateur",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="password",
+     *         in="path",
+     *         description="Le mot de passe du nouvel utilisateur",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Retourne un message de succès lors de l'enregistrement réussi",
+     *         @OA\JsonContent(ref=@Model(type=Compte::class))
+     *     )
+     * )
+     */
+    #[Route('/api/register', name: 'app_register', methods: ['POST'])]
+    public function register(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
+        $data = json_decode($request->getContent(), true);
+
         try{
+            $login = $data['login'];
+            $password = $data['password'];
             $utilisateurExistant = $entityManager->getRepository(Compte::class)->findOneBy(['login' => $login]);
             // verifier si le compte existe deja, si oui on retourne une erreur
             if ($utilisateurExistant) {

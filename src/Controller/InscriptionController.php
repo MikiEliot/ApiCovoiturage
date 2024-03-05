@@ -11,9 +11,47 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Route('/api')]
 
 class InscriptionController extends AbstractController
 {
+    /**
+     * @OA\Delete(
+     *     path="/api/deletePersonne/{id}",
+     *     summary="Supprimer une personne",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="L'identifiant de l'élève",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Retourne un message de succès lors de la suppression réussie",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Retourne une erreur si l'élève n'est pas trouvé",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Retourne une erreur si une exception est levée lors de la suppression de l'élève",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     )
+     * )
+     */
     #[Route('/listeInscription', name: 'app_liste_inscription', methods: ['GET'])]
     public function listeInscription(EntityManagerInterface $entityManager): JsonResponse
     {
@@ -57,6 +95,44 @@ class InscriptionController extends AbstractController
             return new JsonResponse(['error' => 'Erreur lors de la recuperation des inscriptions: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    /**
+     * @OA\Delete(
+     *     path="/api/deletePersonne/{id}",
+     *     summary="Supprimer une personne",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="L'identifiant de l'élève",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Retourne un message de succès lors de la suppression réussie",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Retourne une erreur si l'élève n'est pas trouvé",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Retourne une erreur si une exception est levée lors de la suppression de l'élève",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     )
+     * )
+     */
     #[Route('/listeInscriptionConducteur/{idtrajet}', name: 'app_liste_inscription_conducteur', methods: ['GET'])]
     public function listeInscriptionConducteur(int $idtrajet, EntityManagerInterface $entityManager): JsonResponse
     {
@@ -85,6 +161,44 @@ class InscriptionController extends AbstractController
             return new JsonResponse(['error' => 'Erreur lors de la recuperation du conducteur: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/listeInscriptionUser/{idpers}",
+     *     summary="Lister les trajets d'un élève",
+     *     @OA\Parameter(
+     *         name="idpers",
+     *         in="path",
+     *         description="L'identifiant de l'élève",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Retourne une liste de trajets pour un élève spécifique",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref=@Model(type=Trajet::class))
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Retourne une erreur si l'élève n'est pas trouvé",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Retourne une erreur si une exception est levée lors de la récupération des trajets",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     )
+     * )
+     */
     #[Route('/listeInscriptionUser/{idpers}', name: 'app_liste_inscription_participant', methods: ['GET'])]
     public function listeInscriptionUser(int $idpers, EntityManagerInterface $entityManager): JsonResponse
     {
@@ -113,6 +227,51 @@ class InscriptionController extends AbstractController
             return new JsonResponse(['error' => 'Erreur lors de la récupération des trajets: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    /**
+     * @OA\Post(
+     *     path="/api/insertInscription/{idpers},{idtrajet}",
+     *     summary="Inscrire un élève à un trajet",
+     *     @OA\Parameter(
+     *         name="idpers",
+     *         in="path",
+     *         description="L'identifiant de l'élève",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="idtrajet",
+     *         in="path",
+     *         description="L'identifiant du trajet",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Retourne un message de succès lors de l'inscription réussie",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Retourne une erreur si l'élève ou le trajet n'est pas trouvé",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Retourne une erreur si une exception est levée lors de l'inscription",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     )
+     * )
+     */
     #[Route('/insertInscription/{idpers},{idtrajet}', name: 'app_insert_inscription', methods: ['POST'])]
     public function insertInscription(int $idpers, int $idtrajet, EntityManagerInterface $entityManager): JsonResponse
     {
@@ -133,6 +292,44 @@ class InscriptionController extends AbstractController
             return new JsonResponse(['error' => 'Erreur lors de la creation de l\'inscription: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    /**
+     * @OA\Delete(
+     *     path="/api/deleteInscription/{id}",
+     *     summary="Supprimer une inscription",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="L'identifiant de l'inscription",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Retourne un message de succès lors de la suppression réussie",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Retourne une erreur si l'inscription n'est pas trouvée",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Retourne une erreur si une exception est levée lors de la suppression de l'inscription",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string")
+     *         )
+     *     )
+     * )
+     */
     #[Route('/deleteInscription/{id}', name: 'app_delete_inscription', methods: ['DELETE'])]
     public function deleteInscription(int $id, EntityManagerInterface $entityManager): JsonResponse
     {
